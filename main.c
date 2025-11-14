@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
-#include "include/FreeRTOS.h"
+
+#include "FreeRTOS.h"
+
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
 #include "hardware/clocks.h"
@@ -38,3 +40,34 @@ int main()
 	lcd_print_string(msg);
 }
 
+
+
+/*
+* These functions are requried for FreeRTOS to work in static memory mode.
+*/
+
+#if configSUPPORT_STATIC_ALLOCATION
+static StaticTask_t idle_task_tcb;
+static StackType_t idle_task_stack[mainIDLE_TASK_STACK_DEPTH];
+void vApplicationGetIdleTaskMemory(
+    StaticTask_t **ppxIdleTaskTCBBuffer,
+    StackType_t **ppxIdleTaskStackBuffer,
+    uint32_t *pulIdleTaskStackSize
+) {
+    *ppxIdleTaskTCBBuffer = &idle_task_tcb;
+    *ppxIdleTaskStackBuffer = idle_task_stack;
+    *pulIdleTaskStackSize = mainIDLE_TASK_STACK_DEPTH;
+}
+
+static StaticTask_t timer_task_tcb;
+static StackType_t timer_task_stack[configMINIMAL_STACK_SIZE];
+void vApplicationGetTimerTaskMemory(
+    StaticTask_t **ppxTimerTaskTCBBuffer,
+    StackType_t **ppxTimerTaskStackBuffer,
+    uint32_t *pulTimerTaskStackSize
+) {
+    *ppxTimerTaskTCBBuffer = &timer_task_tcb;
+    *ppxTimerTaskStackBuffer = timer_task_stack;
+    *pulTimerTaskStackSize = configMINIMAL_STACK_SIZE;
+}
+#endif

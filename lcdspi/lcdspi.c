@@ -408,6 +408,7 @@ void display_put_c(char c) {
             // Change of plans
             if (current_y >= vres) {
             	lcd_reset_coords();
+            	current_y += 2*gui_font_height;
             }
             return;
         case '\t':
